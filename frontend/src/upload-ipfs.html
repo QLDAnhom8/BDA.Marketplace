@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Khởi tạo tài sản NFT</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/regular.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css">
+  </head>
+  <body>
+      <header>
+          <div class="logo"></div>
+      </header>
+      <main class="py-5">
+        <div class="container">
+            <div class="row px-3">
+                <div class="col-3 col-sm-2 col-lg-1">
+                    <a class="btn btn-success btn-lg" href="home.html" role="button"><i class="fas fa-home"></i></a>
+                </div>
+                <div class="col-9 col-sm-10 col-lg-5">
+                    <div id="" class="text-white">
+                        <i class="fas fa-dice-d6 mr-2"></i>
+                        <span id="lblIpfsStatus"></span>
+                    </div>
+                    <div id="" class="text-white">
+                        <i class="fas fa-wallet mr-2"></i>
+                        <span id="lblWalletAddress"></span>
+                        <button type="button" name="" id="" class="btn btn-primary btn-sm">Connect</button>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 pt-4 pt-lg-0 d-flex flex-column justify-content-center">
+                    <h3 class="text-center text-lg-right text-warning text-uppercase mb-0"><b>IPFS</b></h2>
+                </div>
+            </div>
+            <!-- <div class="row py-3">
+                <div class="col-12">
+                    
+                </div>
+            </div> -->
+            <div class="row">
+                <label class="col-12 pt-5 pb-3 text-warning text-center">
+                    <span class="h5">Upload file của bạn lên mạng IPFS</span>
+                </label>
+            </div>
+        </div>
+        <div class="container text-white">
+            <form class="p-3">
+                <div class="form-group row">
+                    <label for="txtInput2" class="col-sm-3 col-form-label text-lg-right">
+                        <span class="h5">File của bạn</span>
+                    </label>
+                    <div class="col-9 col-sm-7 col-lg-8">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-danger text-white" id="lblFile">
+                                    <i class="fas fa-file-upload"></i>
+                                </span>
+                            </div>
+                            <div class="custom-file">
+                              <input type="file" class="custom-file-input" id="flUpload" aria-describedby="lblFile">
+                              <label class="custom-file-label" for="flUpload">Bấm để chọn file hoặc kéo thả</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 col-sm-2 col-lg-1">
+                        <button type="button" id="btnUpload" class="btn btn-primary btn-block"><i class="fas fa-upload"></i></button>
+                    </div>
+                </div> 
+                <div class="form-group row">
+                    <div class="col-sm-12 col-lg-8 offset-lg-3">
+                        <div id="lblFileSuccessLink" class="alert alert-success text-break d-none" role="alert"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <div id="lblImage" class="alert alert-warning d-none" role="alert">
+                            <a href=""><img id="imgUploaded" src="" alt="" width="100%"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12 col-sm-9 col-lg-6 offset-sm-3">
+                        <button type="button" class="btn btn-primary btn-lg">Thực hiện</button>
+                        <button type="button" class="btn btn-danger btn-lg ml-3">Huỷ</button>
+                    </div>
+                </div>
+                <fieldset class="form-group row pt-5">
+                    <div class="alert alert-light" role="alert">
+                        <h4 class="alert-heading">Hướng dẫn tạo token NFT</h4>
+                        <p></p>
+                        <p class="mb-0">
+                            Lorem ipsum dolor, sit amet consectetur adipisicing elit. 
+                            Voluptates non quo ipsum, quidem atque sapiente nesciunt. 
+                            Doloremque libero id beatae deserunt, optio nulla esse minus consequuntur 
+                            necessitatibus ab laborum minima?
+                        </p>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+      </main>
+      <footer></footer>
+      
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/ipfs-http-client@50.1.2/dist/index.min.js" integrity="sha384-6OvQ2xEjHhv5ua7idjpeLHv67CHvDBIaSq2xj9pRrsTcmNxIFj6P1pBfkAJVdT1C" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/ipfs@0.55.4/dist/index.min.js" integrity="sha384-+M7aiVrK3nZIlQxS+ig9x1SeRWBkTF37oP6VsEQoynTekYJRjQptMzP2F+V6rJtt" crossorigin="anonymous"></script>
+    <!-- <script src="js/web3.js"></script>
+    <script src="js/app.js"></script> -->
+    <script src="js/app_ipfs.js"></script>
+    <script>
+        // $(document).ready(function() {
+            
+        // })
+        // $(function () {
+        //     $('[data-toggle="tooltip"]').tooltip()
+        // })
+
+        document.addEventListener('DOMContentLoaded', async () => {
+
+            // Khởi tạo AppIPFS
+            await AppIPFS.init();
+
+            // Khởi tạo DOM elements
+            const DOM = {
+                lblIpfsStatus:      document.querySelector('#lblIpfsStatus'),
+                inputFile:          document.querySelector('#flUpload'),
+                btnUpload:          document.querySelector('#btnUpload'),
+                btnRead:            document.querySelector('#btnRead'),
+                lblFileSuccessLink: document.querySelector('#lblFileSuccessLink'),
+                lblImage:           document.querySelector('#lblImage'),
+                lblImageLink:       document.querySelector('#lblImage > a'),
+                imgUploaded:        document.querySelector('#imgUploaded')
+            };
+
+            DOM.lblIpfsStatus.innerHTML = `IPFS status: ${AppIPFS.IpfsNode.isOnline() ? 'online' : 'offline'}`;
+
+            // Initialize Bootstrap custom file input
+            bsCustomFileInput.init();
+
+            
+            // Bắt sự kiện thay đổi giá trị của input upload file
+            DOM.inputFile.addEventListener('change', function() {
+                AppIPFS.selectedFile = this.files[0];
+                console.log(AppIPFS.selectedFile);
+            });
+
+            // Bắt sự kiện click của nút upload
+            DOM.btnUpload.addEventListener('click', async () => {
+                if(AppIPFS.selectedFile != "") {
+
+                    // Kiểm tra IPFS node đã tồn tại hay chưa, nếu chưa có thì tạo node mới
+                    if(AppIPFS.IpfsNode === null || AppIPFS.IpfsNode === undefined) {
+                        AppIPFS.IpfsNode = await Ipfs.create();
+                    }
+                    // console.log(AppIPFS.IpfsNode);
+
+                    // Thêm file vào IPFS node với các tham số về file, options
+                    const result = await AppIPFS.IpfsNode.add(
+                        {
+                            path: AppIPFS.selectedFile.name, 
+                            content: AppIPFS.selectedFile
+                        },
+                        {
+                            //wrapWithDirectory: true,
+                            progress: (prog) => console.log(`received: ${prog}`)
+                        }
+                    );
+                    
+                    // Đọc dữ liệu trả về sau khi add file vào IPFS
+                    AppIPFS.selectedFileCID = result.cid;
+
+                    // let ipfsURL = `https://ipfs.io/ipfs/${AppIPFS.selectedFileCID.toString()}/${AppIPFS.selectedFile.name.toString()}`;
+
+                    let ipfsURL = `https://ipfs.io/ipfs/${AppIPFS.selectedFileCID.toString()}`;
+                    
+                    DOM.lblFileSuccessLink.classList.remove("d-none");
+                    DOM.lblFileSuccessLink.innerHTML = `<a href="${ipfsURL}" target="__blank">${ipfsURL}</a>`;
+
+
+                    DOM.lblImage.classList.remove("d-none");
+                    DOM.lblImageLink.href = ipfsURL;
+                    DOM.imgUploaded.src = ipfsURL;
+                    
+                    console.log(AppIPFS.selectedFileCID);
+                }
+            });
+        })
+    </script>
+  </body>
+</html>

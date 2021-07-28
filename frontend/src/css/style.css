@@ -1,0 +1,110 @@
+html {
+    height: 100%;
+}
+body {
+    min-height: 100%;
+    background-color: #0A0F1E;
+    background-image: url(../images/bda-bg.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+main {
+    min-height: calc(100vh - 9rem); /* 100 view height - logo height & footer height */
+    backdrop-filter: blur(4px);
+}
+footer {
+    min-height: 3rem;
+    background-color: #0A0F1E;
+    background-image: url("../images/footer.jpg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: left center;
+}
+
+.logo {
+    min-height: 6rem;
+    background-color: #F8F8F8;
+    background-image: url("../images/header.jpg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center center;
+}
+
+#txtDiaChiVi::placeholder {
+    color: #fff;
+}
+#articleWrapper {
+    width: 100%;
+    height: 400px;
+}
+.bg-yellow {
+    background-color: rgb(255, 225, 80, .9) !important;
+}
+.bg-yellow-dark {
+    background-color: rgba(222, 167, 0, .85) !important;
+}
+.bg-opa-30 {
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, .3);
+}
+.bg-primary-opa-30 {
+    background-color: rgba(0, 105, 217,30%);
+}
+.bg-primary-opa-30:hover {
+    background-color: rgba(0, 105, 217,80%);
+}
+.bg-success-opa-30 {
+    background-color: rgba(33, 136, 56,30%);
+}
+.bg-success-opa-30:hover {
+    background-color: rgba(33, 136, 56,80%);
+}
+.bg-danger-opa-30 {
+    background-color: rgba(200, 35, 51,30%);
+}
+.bg-danger-opa-30:hover {
+    background-color: rgba(200, 35, 51,80%);
+}
+.bg-warning-opa-30 {
+    background-color: rgba(224, 168, 0,30%);
+}
+.bg-warning-opa-30:hover {
+    background-color: rgba(224, 168, 0,80%);
+}
+.bg-info-opa-30 {
+    background-color: rgba(19, 132, 150,30%);
+}
+.bg-info-opa-30:hover {
+    background-color: rgba(19, 132, 150,80%);
+}
+.bg-secondary-opa-30 {
+    background-color: rgba(90, 98, 104,30%);
+}
+.bg-secondary-opa-30:hover {
+    background-color: rgba(90, 98, 104,80%);
+}
+.bg-light-opa-30 {
+    background-color: rgba(226, 230, 234,30%);
+}
+.bg-light-opa-30:hover {
+    background-color: rgba(226, 230, 234,80%);
+}
+.bg-dark-opa-30 {
+    background-color: rgba(35, 39, 43,30%);
+}
+.bg-dark-opa-30:hover {
+    background-color: rgba(35, 39, 43,80%);
+}
+.btn-square {
+    width: 10rem;
+    height: 10rem;
+}
+.btn-square i.fa, .btn-square i.fas, .btn-square i.fab {
+    font-size: 5rem;
+}
+.btn-square i.fas {
+
+}
+.btn-label {
+    padding: .5rem 0 0;
+}
