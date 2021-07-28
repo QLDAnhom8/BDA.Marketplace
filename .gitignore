@@ -3,3 +3,6 @@ node_modules
 
 # built artifacts
 frontend/src/contracts
+
+# secret file
+.secret
