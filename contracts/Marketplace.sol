@@ -1,5 +1,4 @@
 pragma solidity ^0.5.0;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -78,7 +77,7 @@ contract Marketplace {
         _;
     }
     
-    function KiemTraTokenIdDaCoTrongPhienDauGiaHoatDong(uint _tokenId) private returns(bool) {
+    function KiemTraTokenIdDaCoTrongPhienDauGiaHoatDong(uint _tokenId) private view returns(bool) {
         for(uint i = 1; i <= TongSoPhien; i++){
             PhienDauGia memory objPhien = DanhSachTatCaCacPhienDauGia[i];
             if(_tokenId == objPhien.tokenId && objPhien.HoatDong == true){
@@ -88,7 +87,7 @@ contract Marketplace {
         return false;
     }
     
-    function KiemTraTokenIdDaCoTrongHopDongMuaBanHoatDong(uint _tokenId) private returns(bool) {
+    function KiemTraTokenIdDaCoTrongHopDongMuaBanHoatDong(uint _tokenId) private view returns(bool) {
         for(uint i = 1; i <= TongSoHopDong; i++){
             HopDongMuaBan memory objPhien = DanhSachHopDongMuaBan[i];
             if(_tokenId == objPhien.tokenId && objPhien.TrangThaiHopDong == enTrangThaiHopDong.DangBan){
@@ -143,7 +142,7 @@ contract Marketplace {
         emit TaoPhienDauGiaThanhCong(_MaPhien);
     }
     
-    function KiemTraNguoiThamGiaDaCoTrongPhien(uint _MaPhien, address _NguoiThamGia) private KiemTraPhienTonTai(_MaPhien) returns(bool){
+    function KiemTraNguoiThamGiaDaCoTrongPhien(uint _MaPhien, address _NguoiThamGia) private view KiemTraPhienTonTai(_MaPhien) returns(bool){
         uint[] memory DanhSachMaPhienNguoiThamGia = DanhSachPhienDauGiaThamGia[_NguoiThamGia];
         for(uint i = 0; i < DanhSachMaPhienNguoiThamGia.length; i++){
             if(_MaPhien == DanhSachMaPhienNguoiThamGia[i])
