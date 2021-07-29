@@ -1,3 +1,4 @@
+  
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
@@ -16,13 +17,16 @@ contract NginNFT is ERC721, ERC721Enumerable, ERC721Burnable, Ownable {
     Counters.Counter private _tokenIdCounter;
 
     string private _tokenBaseUri;
+    
+    mapping(uint => string) tokenHashById;
 
     constructor(string memory _uri) ERC721("NginNFT", "NGNFT") {
-        _setBaseURI(_uri);
+        _tokenBaseUri = _uri;
     }
 
-    function safeMint(address to) public {
+    function safeMint(address to, string memory tokenHash) public {
         _safeMint(to, _tokenIdCounter.current());
+        tokenHashById[_tokenIdCounter.current()] = tokenHash;
         _tokenIdCounter.increment();
     }
 
@@ -40,6 +44,13 @@ contract NginNFT is ERC721, ERC721Enumerable, ERC721Burnable, Ownable {
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+    
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+        
+        string memory baseURI = _baseURI();
+        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenHashById[tokenId])) : "";
     }
     
     function _baseURI() internal view override returns (string memory) {
