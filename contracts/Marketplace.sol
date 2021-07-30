@@ -11,28 +11,23 @@ contract Marketplace {
     
     address NguoiTaoContract;
     
-    enum enTrangThaiHopDong{
-        KhoiTao,
-        DangBan,
-        DaBan
-    }
-    
     struct HopDongMuaBan {
         address     NguoiMua;
         address     NguoiBan;
         
         uint        tokenId;
+        uint        MaHopDong;
         uint        TienHang;
         uint        TienNguoiMuaGuiVao;
         
-        enTrangThaiHopDong TrangThaiHopDong;
+        bool HoatDong; //true: Dang Ban, false: Da Ban
     }
     
     uint public TongSoHopDong;
     
     mapping(uint => HopDongMuaBan) public DanhSachHopDongMuaBan;
     
-    mapping(address => mapping(uint => HopDongMuaBan)) public DanhSachHopDongCuaNguoiBan;
+    mapping(address => uint[]) public DanhSachHopDongCuaNguoiBan;
  
     uint public TongSoPhien;
  
@@ -71,6 +66,8 @@ contract Marketplace {
     event MuaThanhCong(uint tokenId);
     event KetThucPhienDauGiaThanhCong(uint MaPhien, uint TienDauGiaCuoiCung);
     event NhanTienDauGiaThanhCong(uint TienDauGiaCuoiCung);
+    event TaoHopDongMuaBanThanhCong(uint _MaPhien);
+    event MuaHangThanhCong(uint tokenId, uint TienHang);
     
     modifier KiemTraPhienTonTai(uint _MaPhien) {
         require(DanhSachTatCaCacPhienDauGia[_MaPhien].MaPhien == _MaPhien);
@@ -90,7 +87,7 @@ contract Marketplace {
     function KiemTraTokenIdDaCoTrongHopDongMuaBanHoatDong(uint _tokenId) private view returns(bool) {
         for(uint i = 1; i <= TongSoHopDong; i++){
             HopDongMuaBan memory objPhien = DanhSachHopDongMuaBan[i];
-            if(_tokenId == objPhien.tokenId && objPhien.TrangThaiHopDong == enTrangThaiHopDong.DangBan){
+            if(_tokenId == objPhien.tokenId && objPhien.HoatDong == true){
                 return true;
             }
         }
@@ -135,7 +132,11 @@ contract Marketplace {
                                             HoatDong: true,
                                             enTrangThaiDauGia: _GiaBanLuon == 0 ? TrangThaiDauGia.TiepTucDauGia : TrangThaiDauGia.ChoPhepMuaLuon
                                             });
-                                            
+        
+        //Approve tokenId cho contract 
+        // KhoNFT.approve(address(this), _tokenId);
+        // KhoNFT.setApprovalForAll(address(this), true);
+        
         //Them phien dau gia vao danh sach cua nguoi tao
         DanhSachPhienDauGiaSoHuu[msg.sender].push(_MaPhien);
         
@@ -196,7 +197,7 @@ contract Marketplace {
         emit DauGiaThanhCong();
     }
         
-    function MuaLuon(uint _MaPhien, uint _SoTienMuaLuon) public KiemTraPhienTonTai(_MaPhien) {
+    function MuaLuonPhienDauGia(uint _MaPhien, uint _SoTienMuaLuon) public KiemTraPhienTonTai(_MaPhien) {
         PhienDauGia storage objPhien = DanhSachTatCaCacPhienDauGia[_MaPhien];
         
         //Kiem tra NguoiBan co phai la msg.sender
@@ -221,10 +222,11 @@ contract Marketplace {
         //Chuyen tien vao contract
         KhoTien.transferFrom(msg.sender, address(this), _SoTienMuaLuon * (1 ether));
         
-        
-                
         //Chuyen quyen token va thay doi hoat dong phien
         KhoNFT.safeTransferFrom(objPhien.NguoiBan , msg.sender ,objPhien.tokenId);
+        
+        //Tra Tien Cho NguoiBan
+        KhoTien.transfer(objPhien.NguoiBan, objPhien.GiaCuoiCung * (1 ether));
         
         objPhien.NguoiDatCuoi = msg.sender;
         objPhien.GiaCuoiCung = _SoTienMuaLuon;
@@ -240,7 +242,8 @@ contract Marketplace {
         //Kiem tra nguoi goi ham co phai la NguoiBan?
         require(msg.sender == objPhien.NguoiBan, "Ban khong co quyen goi ham");
         
-        //Kiem tra thoi gian ket thuc phien
+        //Kiem tra hoat dong  thoi gian ket thuc phien
+        require(objPhien.HoatDong == true, "Phien dau gia da ket thuc");
         require(objPhien.ThoiGianKetThuc <= block.timestamp, "Phien dau gia van dang dien ra");
         
         objPhien.HoatDong = false;
@@ -258,4 +261,60 @@ contract Marketplace {
         
         emit KetThucPhienDauGiaThanhCong(objPhien.MaPhien, objPhien.GiaCuoiCung == objPhien.GiaKhoiDiem ? 0 : objPhien.GiaCuoiCung);
     }
+    
+    function TaoHopDongMuaBan(uint _tokenId, uint _TienHang) public {
+        require(KhoNFT.ownerOf(_tokenId) != address(0), "Token id khong ton tai");
+        //Kiem tra xem tokenId nay co dang dau gia tai phien khac hay khong?
+        require(KiemTraTokenIdDaCoTrongPhienDauGiaHoatDong(_tokenId) == false, "Token nay dang duoc dau gia tai phien khac");
+        //Kiem tra xem tokenId nay co dang ban tai HopDongMuaBan khac hay khong?
+        require(KiemTraTokenIdDaCoTrongHopDongMuaBanHoatDong(_tokenId) == false, "Token nay dang duoc ban tai hop dong khac");
+        
+        //Kiem tra tien hang
+        require(_TienHang > 0 , "Tien hang khong hop le");
+        TongSoHopDong++;
+        uint _MaHopDong = TongSoHopDong;
+        DanhSachHopDongMuaBan[_MaHopDong] = HopDongMuaBan({
+                                                            NguoiMua : address(0),
+                                                            NguoiBan : msg.sender,
+                                                            MaHopDong : _MaHopDong,
+                                                            tokenId : _tokenId,
+                                                            TienHang : _TienHang,
+                                                            TienNguoiMuaGuiVao : 0,
+                                                            HoatDong : true
+                                                            });
+        
+        // thêm MaHopDong vào DanhSachHopDongCuaNguoiBan của NguoiBan 
+        DanhSachHopDongCuaNguoiBan[msg.sender].push(_MaHopDong);
+        
+        emit TaoHopDongMuaBanThanhCong(_MaHopDong);
+    }
+    
+    modifier KiemTraHopDongTonTai(uint _MaHopDong){
+        require(DanhSachHopDongMuaBan[_MaHopDong].MaHopDong == _MaHopDong);
+        _;
+    }
+    
+    function MuaHang(uint _MaHopDong, uint _TienNguoiMuaGuiVao) public KiemTraHopDongTonTai(_MaHopDong){
+        HopDongMuaBan storage objHopDong = DanhSachHopDongMuaBan[_MaHopDong];
+        //Kiem tra trang thai hoat dong cua hop dong
+        require(objHopDong.HoatDong == true, "Mat hang nay da ban");
+        // kiểm tra tiền trả 
+        require(_TienNguoiMuaGuiVao == objHopDong.TienHang,"So tien gui vao khong hop le");
+        // kiểm tra NguoiBan có phải là msg.sender
+        require(msg.sender != objHopDong.NguoiBan, "Nguoi ban khong duoc mua");
+        
+        //Chuyen tien vao contract
+        KhoTien.transferFrom(msg.sender, address(this), _TienNguoiMuaGuiVao * (1 ether));
+        // chuyển quyền sở hữu token 
+        KhoNFT.safeTransferFrom(objHopDong.NguoiBan, msg.sender, objHopDong.tokenId);
+        //Tra Tien Cho NguoiBan
+        KhoTien.transfer(objHopDong.NguoiBan, objHopDong.TienHang * (1 ether));
+        
+        objHopDong.NguoiBan = msg.sender;
+        objHopDong.TienNguoiMuaGuiVao = _TienNguoiMuaGuiVao;
+        objHopDong.HoatDong = false;
+        
+        emit MuaHangThanhCong(objHopDong.tokenId, objHopDong.TienHang);
+    }
+    
 }
