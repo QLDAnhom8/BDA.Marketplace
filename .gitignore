@@ -6,3 +6,4 @@ frontend/src/contracts
 
 # secret file
 .secret
+package copy.json
