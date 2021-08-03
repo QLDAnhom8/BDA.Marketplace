@@ -1,15 +1,19 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract Marketplace {
+contract Marketplace is ERC721Holder {
     
     IERC20 public KhoTien;
     
     IERC721 public KhoNFT;
     
     address NguoiTaoContract;
+    
+    enum enTrangThaiHopDong{ DangBan, DaBan, HuyBan}
     
     struct HopDongMuaBan {
         address     NguoiMua;
@@ -20,7 +24,7 @@ contract Marketplace {
         uint        TienHang;
         uint        TienNguoiMuaGuiVao;
         
-        bool HoatDong; //true: Dang Ban, false: Da Ban
+        enTrangThaiHopDong TrangThaiHopDong;
     }
     
     uint public TongSoHopDong;
@@ -68,9 +72,15 @@ contract Marketplace {
     event NhanTienDauGiaThanhCong(uint TienDauGiaCuoiCung);
     event TaoHopDongMuaBanThanhCong(uint _MaPhien);
     event MuaHangThanhCong(uint tokenId, uint TienHang);
+    event HuyBanHangThanhCong(uint MaHopDong);
     
     modifier KiemTraPhienTonTai(uint _MaPhien) {
         require(DanhSachTatCaCacPhienDauGia[_MaPhien].MaPhien == _MaPhien);
+        _;
+    }
+    
+    modifier KiemTraHopDongTonTai(uint _MaHopDong){
+        require(DanhSachHopDongMuaBan[_MaHopDong].MaHopDong == _MaHopDong);
         _;
     }
     
@@ -87,13 +97,15 @@ contract Marketplace {
     function KiemTraTokenIdDaCoTrongHopDongMuaBanHoatDong(uint _tokenId) private view returns(bool) {
         for(uint i = 1; i <= TongSoHopDong; i++){
             HopDongMuaBan memory objPhien = DanhSachHopDongMuaBan[i];
-            if(_tokenId == objPhien.tokenId && objPhien.HoatDong == true){
+            if(_tokenId == objPhien.tokenId && objPhien.TrangThaiHopDong == enTrangThaiHopDong.DangBan){
                 return true;
             }
         }
         return false;
     }
     
+    
+    //Dau gia
     function TaoPhienDauGia(
         uint _tokenId,
         uint _GiaKhoiDiem,
@@ -133,9 +145,8 @@ contract Marketplace {
                                             enTrangThaiDauGia: _GiaBanLuon == 0 ? TrangThaiDauGia.TiepTucDauGia : TrangThaiDauGia.ChoPhepMuaLuon
                                             });
         
-        //Approve tokenId cho contract 
-        // KhoNFT.approve(address(this), _tokenId);
-        // KhoNFT.setApprovalForAll(address(this), true);
+        //Chuyen token vao contract
+        KhoNFT.safeTransferFrom(msg.sender, address(this), _tokenId); 
         
         //Them phien dau gia vao danh sach cua nguoi tao
         DanhSachPhienDauGiaSoHuu[msg.sender].push(_MaPhien);
@@ -222,8 +233,8 @@ contract Marketplace {
         //Chuyen tien vao contract
         KhoTien.transferFrom(msg.sender, address(this), _SoTienMuaLuon * (1 ether));
         
-        //Chuyen quyen token va thay doi hoat dong phien
-        KhoNFT.safeTransferFrom(objPhien.NguoiBan , msg.sender ,objPhien.tokenId);
+        //Chuyen token cho nguoi mua 
+        KhoNFT.safeTransferFrom(address(this) , msg.sender ,objPhien.tokenId);
         
         //Tra Tien Cho NguoiBan
         KhoTien.transfer(objPhien.NguoiBan, objPhien.GiaCuoiCung * (1 ether));
@@ -249,19 +260,23 @@ contract Marketplace {
         objPhien.HoatDong = false;
         
         if(objPhien.NguoiDatCuoi != address(0)){
-            //Kiem tra xem token co con` so huu boi NguoiBan k
-            if(KhoNFT.ownerOf(objPhien.tokenId) == objPhien.NguoiBan){
+            //Kiem tra xem token co con` so huu boi NguoiBan khong
+            if(KhoNFT.ownerOf(objPhien.tokenId) != objPhien.NguoiDatCuoi){
                 //Chuyen token cho NguoiDatCuoi
-                KhoNFT.safeTransferFrom(objPhien.NguoiBan , objPhien.NguoiDatCuoi ,objPhien.tokenId);
+                KhoNFT.safeTransferFrom(address(this) , objPhien.NguoiDatCuoi ,objPhien.tokenId);
             }
             
             //Tra Tien Cho NguoiBan
             KhoTien.transfer(objPhien.NguoiBan, objPhien.GiaCuoiCung * (1 ether));
+        } else {
+            //Neu phien ket thuc ma khong ai dau gia. Tra token cho NguoiBan
+            KhoNFT.safeTransferFrom(address(this) , objPhien.NguoiBan ,objPhien.tokenId);
         }
         
         emit KetThucPhienDauGiaThanhCong(objPhien.MaPhien, objPhien.GiaCuoiCung == objPhien.GiaKhoiDiem ? 0 : objPhien.GiaCuoiCung);
     }
     
+    // Mua Ban
     function TaoHopDongMuaBan(uint _tokenId, uint _TienHang) public {
         require(KhoNFT.ownerOf(_tokenId) != address(0), "Token id khong ton tai");
         //Kiem tra xem tokenId nay co dang dau gia tai phien khac hay khong?
@@ -280,8 +295,11 @@ contract Marketplace {
                                                             tokenId : _tokenId,
                                                             TienHang : _TienHang,
                                                             TienNguoiMuaGuiVao : 0,
-                                                            HoatDong : true
+                                                            TrangThaiHopDong : enTrangThaiHopDong.DangBan
                                                             });
+                                                            
+        //Chuyen token vao contract
+        KhoNFT.safeTransferFrom(msg.sender, address(this), _tokenId);                                                    
         
         // thêm MaHopDong vào DanhSachHopDongCuaNguoiBan của NguoiBan 
         DanhSachHopDongCuaNguoiBan[msg.sender].push(_MaHopDong);
@@ -289,15 +307,10 @@ contract Marketplace {
         emit TaoHopDongMuaBanThanhCong(_MaHopDong);
     }
     
-    modifier KiemTraHopDongTonTai(uint _MaHopDong){
-        require(DanhSachHopDongMuaBan[_MaHopDong].MaHopDong == _MaHopDong);
-        _;
-    }
-    
     function MuaHang(uint _MaHopDong, uint _TienNguoiMuaGuiVao) public KiemTraHopDongTonTai(_MaHopDong){
         HopDongMuaBan storage objHopDong = DanhSachHopDongMuaBan[_MaHopDong];
         //Kiem tra trang thai hoat dong cua hop dong
-        require(objHopDong.HoatDong == true, "Mat hang nay da ban");
+        require(objHopDong.TrangThaiHopDong == enTrangThaiHopDong.DangBan, "Mat hang nay dang khong ban");
         // kiểm tra tiền trả 
         require(_TienNguoiMuaGuiVao == objHopDong.TienHang,"So tien gui vao khong hop le");
         // kiểm tra NguoiBan có phải là msg.sender
@@ -306,15 +319,30 @@ contract Marketplace {
         //Chuyen tien vao contract
         KhoTien.transferFrom(msg.sender, address(this), _TienNguoiMuaGuiVao * (1 ether));
         // chuyển quyền sở hữu token 
-        KhoNFT.safeTransferFrom(objHopDong.NguoiBan, msg.sender, objHopDong.tokenId);
+        KhoNFT.safeTransferFrom(address(this), msg.sender, objHopDong.tokenId);
         //Tra Tien Cho NguoiBan
         KhoTien.transfer(objHopDong.NguoiBan, objHopDong.TienHang * (1 ether));
         
         objHopDong.NguoiBan = msg.sender;
         objHopDong.TienNguoiMuaGuiVao = _TienNguoiMuaGuiVao;
-        objHopDong.HoatDong = false;
+        objHopDong.TrangThaiHopDong = enTrangThaiHopDong.DaBan;
         
         emit MuaHangThanhCong(objHopDong.tokenId, objHopDong.TienHang);
+    }
+    
+    
+    function HuyBanHang(uint _MaHopDong) public KiemTraHopDongTonTai(_MaHopDong) {
+        HopDongMuaBan storage objHopDong = DanhSachHopDongMuaBan[_MaHopDong];
+        // kiểm tra NguoiBan có phải là msg.sender
+        require(msg.sender == objHopDong.NguoiBan, "Ban khong quyen huy ban");
+        //Kiem tra trang thai hoat dong cua hop dong
+        require(objHopDong.TrangThaiHopDong == enTrangThaiHopDong.DangBan, "Mat hang dang khong ban");
+        
+        // chuyển quyền sở hữu token cho NguoiBan
+        KhoNFT.safeTransferFrom(address(this), objHopDong.NguoiBan, objHopDong.tokenId);
+        
+        objHopDong.TrangThaiHopDong = enTrangThaiHopDong.HuyBan;
+        emit HuyBanHangThanhCong(objHopDong.MaHopDong);
     }
     
 }

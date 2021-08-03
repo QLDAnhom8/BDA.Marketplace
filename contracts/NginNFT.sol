@@ -21,7 +21,7 @@ contract NginNFT is ERC721, ERC721Enumerable, ERC721Burnable, Ownable {
     mapping(uint => string) tokenHashById;
 
     constructor(string memory _uri) ERC721("NginNFT", "NGNFT") {
-        _tokenBaseUri = _uri;
+        _setBaseURI(_uri);
     }
 
     function safeMint(address to, string memory tokenHash) public {
