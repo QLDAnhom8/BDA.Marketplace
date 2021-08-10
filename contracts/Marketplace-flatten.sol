@@ -586,7 +586,7 @@ contract Marketplace is ERC721Holder {
         PhienDauGia storage objPhien = DanhSachTatCaCacPhienDauGia[_MaPhien];
         
         //Kiem tra nguoi goi ham co phai la NguoiBan?
-        require(msg.sender == objPhien.NguoiBan, "Ban khong co quyen goi ham");
+        require(msg.sender == objPhien.NguoiBan || msg.sender == objPhien.NguoiDatCuoi || msg.sender == NguoiTaoContract, "Ban khong co quyen goi ham");
         
         //Kiem tra hoat dong  thoi gian ket thuc phien
         require(objPhien.HoatDong == true, "Phien dau gia da ket thuc");
@@ -658,7 +658,7 @@ contract Marketplace is ERC721Holder {
         //Tra Tien Cho NguoiBan
         KhoTien.transfer(objHopDong.NguoiBan, objHopDong.TienHang * (1 ether));
         
-        objHopDong.NguoiBan = msg.sender;
+        objHopDong.NguoiMua = msg.sender;
         objHopDong.TienNguoiMuaGuiVao = _TienNguoiMuaGuiVao;
         objHopDong.TrangThaiHopDong = enTrangThaiHopDong.DaBan;
         
@@ -669,7 +669,7 @@ contract Marketplace is ERC721Holder {
     function HuyBanHang(uint _MaHopDong) public KiemTraHopDongTonTai(_MaHopDong) {
         HopDongMuaBan storage objHopDong = DanhSachHopDongMuaBan[_MaHopDong];
         // kiểm tra NguoiBan có phải là msg.sender
-        require(msg.sender == objHopDong.NguoiBan, "Ban khong quyen huy ban");
+        require(msg.sender == objHopDong.NguoiBan || msg.sender == NguoiTaoContract, "Ban khong quyen huy ban");
         //Kiem tra trang thai hoat dong cua hop dong
         require(objHopDong.TrangThaiHopDong == enTrangThaiHopDong.DangBan, "Mat hang dang khong ban");
         
