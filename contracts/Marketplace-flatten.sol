@@ -680,4 +680,16 @@ contract Marketplace is ERC721Holder {
         emit HuyBanHangThanhCong(objHopDong.MaHopDong);
     }
     
+    function LayDanhSachMaHopDongSoHuu(address NguoiSoHuu) public view returns(uint[] memory) {
+        return DanhSachHopDongCuaNguoiBan[NguoiSoHuu];
+    }
+    
+    function LayDanhSachMaPhienDauGiaSoHuu(address NguoiSoHuu) public view returns(uint[] memory) {
+        return DanhSachPhienDauGiaSoHuu[NguoiSoHuu];
+    }
+    
+    function LayDanhSachMaPhienDauGiaThamGia(address NguoiThamGia) public view returns(uint[] memory) {
+        return DanhSachPhienDauGiaThamGia[NguoiThamGia];
+    }
+    
 }
