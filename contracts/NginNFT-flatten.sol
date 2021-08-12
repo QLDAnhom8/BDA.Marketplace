@@ -1348,6 +1348,11 @@ contract NginNFT is ERC721, ERC721Enumerable, ERC721Burnable, Ownable {
         tokenHashById[_tokenIdCounter.current()] = tokenHash;
         _tokenIdCounter.increment();
     }
+    
+    function setBaseURI(string memory _uri) public {
+        require(msg.sender == owner(), "You don't have permission to call this function");
+        _setBaseURI(_uri);
+    }
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)
         internal

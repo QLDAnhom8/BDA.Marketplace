@@ -77,6 +77,7 @@ contract Marketplace is ERC721Holder {
     event HuyBanHangThanhCong(uint MaHopDong);
     event DoiKhoTienThanhCong(address adDiaChiKhoTien);
     event DoiKhoNFTThanhCong(address adDiaChiKhoTien);
+    event DaHuyPhienDauGia(uint MaPhien);
 
     modifier KiemTraPhienTonTai(uint _MaPhien) {
         require(DanhSachTatCaCacPhienDauGia[_MaPhien].MaPhien == _MaPhien);
@@ -94,7 +95,8 @@ contract Marketplace is ERC721Holder {
     }
     
     function ChuyenDiaChiKho(enLoaiKho loaiKho, address adDiaChiKho) public KiemTraNguoiTaoContractGoiHam(){
-        require(loaiKho <= enLoaiKho.KhoTien, "Loai kho khong hop le");
+        require(loaiKho <= enLoaiKho.KhoNFT, "Loai kho khong hop le");
+        require(KhoNFT.balanceOf(address(this)) == 0, "Contract van dang giu 1 luong token. Hay tra token roi moi chuyen dia chi kho");
         if(loaiKho == enLoaiKho.KhoTien){
             KhoTien = IERC20(adDiaChiKho);
             emit DoiKhoTienThanhCong(adDiaChiKho);
@@ -267,20 +269,25 @@ contract Marketplace is ERC721Holder {
         emit MuaThanhCong(objPhien.tokenId);
     }
     
-    function KetThucPhienDauGia(uint _MaPhien) public KiemTraPhienTonTai(_MaPhien) {
+    function KetThucPhienDauGia(uint _MaPhien) external KiemTraPhienTonTai(_MaPhien) {
         PhienDauGia storage objPhien = DanhSachTatCaCacPhienDauGia[_MaPhien];
         
-        //Kiem tra nguoi goi ham co phai la NguoiBan?
-        require(msg.sender == objPhien.NguoiBan || msg.sender == objPhien.NguoiDatCuoi || msg.sender == NguoiTaoContract, "Ban khong co quyen goi ham");
-        
-        //Kiem tra hoat dong  thoi gian ket thuc phien
-        require(objPhien.HoatDong == true, "Phien dau gia da ket thuc");
-        require(objPhien.ThoiGianKetThuc <= block.timestamp, "Phien dau gia van dang dien ra");
+        if(msg.sender != NguoiTaoContract){
+            //Kiem tra xem co phai NguoiBan/NguoiDatCuoi goi ham
+            require(msg.sender == objPhien.NguoiBan || msg.sender == objPhien.NguoiDatCuoi, "Ban khong co quyen goi ham");
+            _NguoiDungKetThucPhienDauGia(objPhien);
+        } else {
+            //Kiem tra admin goi ham la de ket thuc phien hay huy phien
+            //TH huy thi return
+            if(_AdminHuyPhienDauGia(objPhien) == true)
+                return;
+            //Th ket thuc thi tiep tuc chay
+        }
         
         objPhien.HoatDong = false;
         
         if(objPhien.NguoiDatCuoi != address(0)){
-            //Kiem tra xem token co con` so huu boi NguoiBan khong
+            //Kiem tra xem token so huu boi NguoiDatCuoi chua
             if(KhoNFT.ownerOf(objPhien.tokenId) != objPhien.NguoiDatCuoi){
                 //Chuyen token cho NguoiDatCuoi
                 KhoNFT.safeTransferFrom(address(this) , objPhien.NguoiDatCuoi ,objPhien.tokenId);
@@ -294,6 +301,35 @@ contract Marketplace is ERC721Holder {
         }
         
         emit KetThucPhienDauGiaThanhCong(objPhien.MaPhien, objPhien.GiaCuoiCung == objPhien.GiaKhoiDiem ? 0 : objPhien.GiaCuoiCung);
+    }
+    
+    function _NguoiDungKetThucPhienDauGia(PhienDauGia memory objPhien) view internal {
+        require(objPhien.HoatDong == true, "Phien dau gia da ket thuc");
+        require(objPhien.ThoiGianKetThuc <= block.timestamp, "Phien dau gia van dang dien ra");
+    }
+    
+    function _AdminHuyPhienDauGia(PhienDauGia storage objPhien) internal KiemTraNguoiTaoContractGoiHam returns(bool)  {
+        //Neu la admin
+        //Kiem tra xem phien den thoi gian ket thuc chua
+        if(block.timestamp < objPhien.ThoiGianKetThuc){
+            //Neu chua
+            //Kiem tra xem da co ai dau gia chua
+            if(objPhien.NguoiDatCuoi != address(0)){
+                //Neu co
+                //Kiem tra xem token so huu boi NguoiDatCuoi chua
+                require(KhoNFT.ownerOf(objPhien.tokenId) != objPhien.NguoiDatCuoi, "Nguoi mua da mua token nay roi");
+                //Neu chua
+                //Tra tien cho nguoi dat cuoi
+                KhoTien.transfer(objPhien.NguoiDatCuoi, objPhien.GiaCuoiCung * (1 ether));
+                //Tra token cho nguoi ban
+                KhoNFT.safeTransferFrom(address(this) , objPhien.NguoiBan ,objPhien.tokenId);
+                    
+                objPhien.HoatDong = false;
+                emit DaHuyPhienDauGia(objPhien.MaPhien);
+                return true;
+            }
+        }
+        return false;
     }
     
     // Mua Ban
@@ -378,4 +414,3 @@ contract Marketplace is ERC721Holder {
     }
     
 }
-
